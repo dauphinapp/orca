@@ -1,0 +1,32 @@
+# Xcode
+DerivedData/
+.DerivedData/
+build/
+*.xcuserdata/
+*.xcuserstate
+*.moved-aside
+*.xccheckout
+*.xcscmblueprint
+orca.xcodeproj/
+!orca.xcodeproj/
+orca.xcodeproj/*
+!orca.xcodeproj/project.xcworkspace/
+orca.xcodeproj/project.xcworkspace/*
+!orca.xcodeproj/project.xcworkspace/xcshareddata/
+orca.xcodeproj/project.xcworkspace/xcshareddata/*
+!orca.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/
+orca.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/*
+!orca.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+
+# Swift Package Manager
+.build/
+.SourcePackages/
+
+# macOS
+.DS_Store
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output/
