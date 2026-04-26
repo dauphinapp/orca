@@ -1,0 +1,105 @@
+name: orca
+options:
+  bundleIdPrefix: cantpr09ram.dauphin
+  deploymentTarget:
+    iOS: "17.0"
+  developmentLanguage: en
+  fileTypes:
+    icon:
+      file: true
+  xcodeVersion: "26.4"
+packages:
+  ComposableArchitecture:
+    url: https://github.com/pointfreeco/swift-composable-architecture
+    from: 1.0.0
+  CasePaths:
+    url: https://github.com/pointfreeco/swift-case-paths
+    from: 1.0.0
+  Dependencies:
+    url: https://github.com/pointfreeco/swift-dependencies
+    from: 1.0.0
+  Perception:
+    url: https://github.com/pointfreeco/swift-perception
+    from: 2.0.0
+settings:
+  base:
+    MARKETING_VERSION: 0.1.0
+    CURRENT_PROJECT_VERSION: 1
+    SWIFT_VERSION: 6.0
+    GENERATE_INFOPLIST_FILE: NO
+targets:
+  orca:
+    type: application
+    platform: iOS
+    sources:
+      - path: orca/Sources
+      - path: orca/Resources/AppIcon.icon
+        buildPhase: resources
+      - path: orca/Resources/AppIconDev.icon
+        buildPhase: resources
+    dependencies:
+      - package: ComposableArchitecture
+      - package: CasePaths
+      - package: Dependencies
+      - package: Perception
+        product: PerceptionCore
+      - target: CoursesWidgetExtension
+        embed: true
+    settings:
+      base:
+        PRODUCT_NAME: Dauphin
+        PRODUCT_MODULE_NAME: orca
+        PRODUCT_BUNDLE_IDENTIFIER: cantpr09ram.dauphin
+        CODE_SIGN_ENTITLEMENTS: orca/Resources/orca.entitlements
+        INFOPLIST_FILE: orca/Resources/Info.plist
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ENABLE_PREVIEWS: YES
+  orcaTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: orcaTests
+    dependencies:
+      - target: orca
+      - package: ComposableArchitecture
+      - package: CasePaths
+      - package: Dependencies
+      - package: Perception
+        product: PerceptionCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: cantpr09ram.dauphin.tests
+        TEST_HOST: $(BUILT_PRODUCTS_DIR)/Dauphin.app/Dauphin
+        BUNDLE_LOADER: $(TEST_HOST)
+  CoursesWidgetExtension:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: CoursesWidget
+      - path: orca/Sources/Models/CourseCache.swift
+      - path: orca/Sources/Models/CourseCacheStore.swift
+      - path: orca/Sources/Models/CourseSession.swift
+      - path: orca/Sources/Models/DisplayedCourse.swift
+      - path: orca/Sources/Models/NextCourseResolver.swift
+      - path: orca/Sources/Models/UpcomingScheduledCourseResolver.swift
+      - path: orca/Sources/Models/CourseSchedule/AppSettings.swift
+      - path: orca/Sources/Models/CourseSchedule/ScheduledCourse.swift
+    settings:
+      base:
+        PRODUCT_NAME: CoursesWidget
+        PRODUCT_MODULE_NAME: CoursesWidget
+        PRODUCT_BUNDLE_IDENTIFIER: cantpr09ram.dauphin.CoursesWidget
+        INFOPLIST_FILE: CoursesWidget/Info.plist
+        CODE_SIGN_ENTITLEMENTS: CoursesWidget/CoursesWidget.entitlements
+        SKIP_INSTALL: YES
+schemes:
+  orca:
+    build:
+      targets:
+        orca: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - orcaTests
