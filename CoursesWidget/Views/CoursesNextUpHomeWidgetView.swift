@@ -2,7 +2,6 @@ import SwiftUI
 import WidgetKit
 
 struct CoursesNextUpHomeWidgetView: View {
-  @Environment(\.widgetFamily) private var family
   let entry: CoursesWidgetEntry
 
   var body: some View {
@@ -27,82 +26,124 @@ struct CoursesNextUpHomeWidgetView: View {
   }
 
   private var populatedView: some View {
-    VStack(alignment: .leading, spacing: 8) {
-      HStack(alignment: .firstTextBaseline) {
-        Text("Next Up")
-          .font(.headline)
-        Spacer()
-        Text("\(entry.todayCount) today")
-          .font(.caption)
+    let displayedCourses = Array(entry.upcomingCourses.prefix(2))
+
+    return VStack(alignment: .leading, spacing: 6) {
+      if let firstCourse = displayedCourses.first {
+        courseBlock(firstCourse)
+      }
+
+      if displayedCourses.count > 1 {
+        Divider()
+          .padding(.leading, -8)
+
+        let secondCourse = displayedCourses[1]
+        courseBlock(
+          secondCourse,
+          weekdayTitle: weekdayTitleIfNeeded(current: secondCourse, previous: displayedCourses[0]),
+          accentColor: isSameDay(secondCourse, as: displayedCourses[0]) ? .blue : .orange
+        )
+      } else {
+        Color.clear
+          .frame(height: 50)
+      }
+    }
+    .padding(.leading, 10)
+    .padding(.trailing, 8)
+    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+  }
+
+  @ViewBuilder
+  private func courseBlock(
+    _ upcoming: UpcomingScheduledCourse,
+    weekdayTitle: String? = nil,
+    accentColor: Color = .blue
+  ) -> some View {
+    VStack(alignment: .leading, spacing: 2) {
+      VStack(alignment: .leading, spacing: 0) {
+        Text(upcoming.course.displayName(showEnglish: entry.showEnglishCourseName))
+          .lineLimit(1)
+          .font(.system(size: courseNameFontSize(for: upcoming.course), weight: .semibold))
+          .foregroundStyle(.primary)
+
+        Text(timeRange(for: upcoming))
+          .font(.footnote)
           .foregroundStyle(.secondary)
       }
 
-      let limit = family == .systemLarge ? 4 : (family == .systemMedium ? 3 : 1)
-      ForEach(Array(entry.upcomingCourses.prefix(limit).enumerated()), id: \.element.id) { index, upcoming in
-        if index > 0 {
-          Divider()
-        }
-
-        VStack(alignment: .leading, spacing: 3) {
-          if calendarDayLabel(for: upcoming) != nil && family != .systemSmall {
-            Text(calendarDayLabel(for: upcoming) ?? "")
-              .font(.caption2)
-              .foregroundStyle(.secondary)
-          }
-
-          Text(upcoming.course.displayName(showEnglish: entry.showEnglishCourseName))
-            .font(.system(size: courseNameFontSize(for: upcoming.course), weight: .semibold))
-            .lineLimit(1)
-
-          Text(timeRange(for: upcoming))
-            .font(.caption)
-            .foregroundStyle(.secondary)
-
-          if family != .systemSmall {
-            Text(upcoming.course.displayTeacher(showEnglish: entry.showEnglishTeacherName))
-              .font(.caption2)
-              .foregroundStyle(.secondary)
-              .lineLimit(1)
-
-            HStack(spacing: 8) {
-              Label(upcoming.course.room, systemImage: "location.circle")
-              if !upcoming.course.seatNo.isEmpty {
-                Label(upcoming.course.seatNo, systemImage: "graduationcap")
-              }
-            }
-            .font(.caption2)
-            .lineLimit(1)
-          }
+      HStack(spacing: 3) {
+        infoChip(icon: "location.circle.fill", value: upcoming.course.room)
+        if !upcoming.course.seatNo.isEmpty {
+          infoChip(icon: "graduationcap", value: upcoming.course.seatNo)
         }
       }
     }
-    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+    .padding(.bottom, 3)
+    .overlay(
+      Capsule()
+        .fill(accentColor)
+        .frame(width: 4)
+        .padding(.leading, -8),
+      alignment: .leading
+    )
   }
 
   private func widgetMessage(icon: String, title: String) -> some View {
     VStack(spacing: 8) {
       Image(systemName: icon)
-        .font(.system(size: family == .systemSmall ? 42 : 52, weight: .semibold))
+        .font(.system(size: 60, weight: .semibold))
       Text(title)
         .font(.caption)
+        .fontWeight(.medium)
         .multilineTextAlignment(.center)
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
   }
 
-  private func calendarDayLabel(for upcoming: UpcomingScheduledCourse) -> String? {
-    guard !Calendar.current.isDate(upcoming.startDate, inSameDayAs: entry.date) else {
+  private func infoChip(icon: String, value: String) -> some View {
+    HStack(spacing: 2) {
+      Image(systemName: icon)
+        .font(.system(size: 8))
+      Text(verbatim: value)
+        .font(.system(size: 10))
+    }
+    .lineLimit(1)
+    .padding(.vertical, 2)
+    .padding(.horizontal, 5)
+    .background(Color.blue.opacity(0.6))
+    .cornerRadius(4)
+  }
+
+  private func isSameDay(_ lhs: UpcomingScheduledCourse, as rhs: UpcomingScheduledCourse) -> Bool {
+    Calendar.current.isDate(lhs.startDate, inSameDayAs: rhs.startDate)
+  }
+
+  private func weekdayTitleIfNeeded(
+    current: UpcomingScheduledCourse,
+    previous: UpcomingScheduledCourse
+  ) -> String? {
+    guard !isSameDay(current, as: previous) else {
       return nil
     }
 
-    return upcoming.startDate.formatted(.dateTime.weekday(.wide))
+    return current.startDate.formatted(.dateTime.weekday(.wide))
   }
 
   private func courseNameFontSize(for course: ScheduledCourse) -> CGFloat {
-    course.isShowingEnglishName(showEnglish: entry.showEnglishCourseName) ? 12 : 14
+    course.isShowingEnglishName(showEnglish: entry.showEnglishCourseName) ? 12 : 15
   }
 
   private func timeRange(for upcoming: UpcomingScheduledCourse) -> String {
     "\(formattedTime(upcoming.startDate)) - \(formattedTime(upcoming.endDate))"
   }
+}
+
+#Preview("Home / Small Scenarios", as: .systemSmall) {
+  CoursesNextUpWidget()
+} timeline: {
+  CoursesWidgetPreviewData.notLoggedIn
+  CoursesWidgetPreviewData.noUpcomingCourses
+  CoursesWidgetPreviewData.sameDayCourses
+  CoursesWidgetPreviewData.mixedDayCourses
+  CoursesWidgetPreviewData.englishNames
 }

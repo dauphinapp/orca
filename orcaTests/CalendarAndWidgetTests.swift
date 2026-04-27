@@ -60,55 +60,85 @@ struct CalendarAndWidgetTests {
   }
 
   @Test
-  func upcomingScheduledCourseResolverSkipsClassesEndingSoon() {
+  func upcomingScheduledCourseResolverSwitchesAtTMinus15Boundary() {
     var calendar = Calendar(identifier: .gregorian)
     calendar.timeZone = TimeZone(secondsFromGMT: 0)!
 
-    let now = DateComponents(
+    let beforeCutover = DateComponents(
       calendar: calendar,
       timeZone: calendar.timeZone,
       year: 2026,
       month: 4,
       day: 20,
-      hour: 14,
-      minute: 50
+      hour: 10,
+      minute: 44
+    ).date!
+    let atCutover = DateComponents(
+      calendar: calendar,
+      timeZone: calendar.timeZone,
+      year: 2026,
+      month: 4,
+      day: 20,
+      hour: 10,
+      minute: 45
+    ).date!
+    let afterCutover = DateComponents(
+      calendar: calendar,
+      timeZone: calendar.timeZone,
+      year: 2026,
+      month: 4,
+      day: 20,
+      hour: 10,
+      minute: 46
     ).date!
 
-    let endingSoon = ScheduledCourse(
-      id: "ending-soon",
-      name: "A",
-      enName: "A",
-      teacher: "Teacher A",
-      teacherEn: "Teacher A",
+    let currentCourse = ScheduledCourse(
+      id: "current-course",
+      name: "Current",
+      enName: "Current",
+      teacher: "Teacher C",
+      teacherEn: "Teacher C",
       room: "E 414",
       seatNo: "001",
       note: "",
       weekday: 1,
-      sessionNumbers: [7],
-      startTime: ScheduledCourse.time(from: "14:10", calendar: calendar) ?? now,
-      endTime: ScheduledCourse.endTime(forSession: 7, calendar: calendar) ?? now
+      sessionNumbers: [5],
+      startTime: ScheduledCourse.time(from: "10:00", calendar: calendar) ?? beforeCutover,
+      endTime: ScheduledCourse.time(from: "10:50", calendar: calendar) ?? beforeCutover
     )
-    let laterToday = ScheduledCourse(
-      id: "later-today",
-      name: "B",
-      enName: "B",
-      teacher: "Teacher B",
-      teacherEn: "Teacher B",
+    let nextCourse = ScheduledCourse(
+      id: "next-course",
+      name: "Next",
+      enName: "Next",
+      teacher: "Teacher N",
+      teacherEn: "Teacher N",
       room: "B 713",
       seatNo: "002",
       note: "",
       weekday: 1,
-      sessionNumbers: [9],
-      startTime: ScheduledCourse.time(from: "16:10", calendar: calendar) ?? now,
-      endTime: ScheduledCourse.endTime(forSession: 9, calendar: calendar) ?? now
+      sessionNumbers: [6],
+      startTime: ScheduledCourse.time(from: "11:00", calendar: calendar) ?? beforeCutover,
+      endTime: ScheduledCourse.time(from: "11:50", calendar: calendar) ?? beforeCutover
     )
 
-    let upcoming = UpcomingScheduledCourseResolver(calendar: calendar).upcomingCourses(
-      from: [endingSoon, laterToday],
-      now: now
+    let resolver = UpcomingScheduledCourseResolver(calendar: calendar)
+
+    let before = resolver.upcomingCourses(
+      from: [currentCourse, nextCourse],
+      now: beforeCutover
+    )
+    let at = resolver.upcomingCourses(
+      from: [currentCourse, nextCourse],
+      now: atCutover
+    )
+    let after = resolver.upcomingCourses(
+      from: [currentCourse, nextCourse],
+      now: afterCutover
     )
 
-    #expect(upcoming.first?.course.id == "later-today")
+    #expect(before.first?.course.id == "current-course")
+    #expect(at.first?.course.id == "next-course")
+    #expect(after.first?.course.id == "next-course")
   }
 
   @Test

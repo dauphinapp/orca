@@ -12,14 +12,14 @@ struct UpcomingScheduledCourse: Equatable, Identifiable {
 
 struct UpcomingScheduledCourseResolver {
   var calendar: Calendar = .current
-  var upcomingThreshold: TimeInterval = 20 * 60
+  var nextCourseCutoverLeadTime: TimeInterval = 15 * 60
 
   func upcomingCourses(
     from courses: [ScheduledCourse],
     now: Date = Date(),
     limit: Int = 5
   ) -> [UpcomingScheduledCourse] {
-    courses
+    let occurrences = courses
       .compactMap { upcomingOccurrence(for: $0, now: now) }
       .sorted { lhs, rhs in
         if lhs.startDate != rhs.startDate {
@@ -28,8 +28,32 @@ struct UpcomingScheduledCourseResolver {
 
         return lhs.course.displayName(showEnglish: false) < rhs.course.displayName(showEnglish: false)
       }
+    let prioritized = prioritizeForCutover(occurrences, now: now)
+
+    return prioritized
       .prefix(limit)
       .map { $0 }
+  }
+
+  private func prioritizeForCutover(
+    _ courses: [UpcomingScheduledCourse],
+    now: Date
+  ) -> [UpcomingScheduledCourse] {
+    guard
+      let currentIndex = courses.firstIndex(where: { $0.startDate <= now && now < $0.endDate }),
+      let nextIndex = courses.firstIndex(where: { $0.startDate > now })
+    else {
+      return courses
+    }
+
+    guard courses[nextIndex].startDate.timeIntervalSince(now) <= nextCourseCutoverLeadTime else {
+      return courses
+    }
+
+    var reordered = courses
+    let nextCourse = reordered.remove(at: nextIndex)
+    reordered.insert(nextCourse, at: currentIndex)
+    return reordered
   }
 
   private func upcomingOccurrence(
@@ -46,7 +70,7 @@ struct UpcomingScheduledCourseResolver {
     var adjustedStartDate = startDate
     var adjustedEndDate = endDate
 
-    if adjustedEndDate.timeIntervalSince(now) <= upcomingThreshold {
+    if adjustedEndDate <= now {
       adjustedStartDate = calendar.date(byAdding: .day, value: 7, to: adjustedStartDate) ?? adjustedStartDate
       adjustedEndDate = calendar.date(byAdding: .day, value: 7, to: adjustedEndDate) ?? adjustedEndDate
     }
