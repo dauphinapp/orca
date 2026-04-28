@@ -97,3 +97,16 @@ extension Date {
     )
   }
 }
+
+#Preview {
+  CourseCardView(
+    courseName: AppPreviewData.firstScheduledCourse.displayName(showEnglish: false),
+    useCompactCourseNameFont: false,
+    roomNumber: AppPreviewData.firstScheduledCourse.room,
+    teacherName: AppPreviewData.firstScheduledCourse.displayTeacher(showEnglish: false),
+    startTime: AppPreviewData.firstScheduledCourse.startTime,
+    endTime: AppPreviewData.firstScheduledCourse.endTime,
+    seatNo: AppPreviewData.firstScheduledCourse.seatNo
+  )
+  .padding()
+}

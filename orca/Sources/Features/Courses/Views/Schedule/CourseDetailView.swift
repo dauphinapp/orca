@@ -109,5 +109,5 @@ struct CourseDetailView: View {
 }
 
 #Preview {
-  CourseDetailView(course: previewCourses.scheduledCourses()[0])
+  CourseDetailView(course: AppPreviewData.firstScheduledCourse)
 }

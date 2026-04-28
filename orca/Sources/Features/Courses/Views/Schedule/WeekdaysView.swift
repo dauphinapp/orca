@@ -23,3 +23,8 @@ struct WeekdaysView: View {
       .frame(maxWidth: .infinity, minHeight: 20)
   }
 }
+
+#Preview {
+  WeekdaysView(days: ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"], currentWeekday: 2)
+    .padding()
+}

@@ -15,39 +15,33 @@ struct DateSelectorView: View {
   }
 
   var body: some View {
-    ScrollViewReader { proxy in
-      ScrollView(.horizontal, showsIndicators: false) {
-        HStack(spacing: 12) {
-          ForEach(items.indices, id: \.self) { index in
-            let date = items[index]
-            let isSelected = selectedIndex == index
-            let isToday = calendar.isDateInToday(date)
+    HStack(spacing: 8) {
+      ForEach(items.indices, id: \.self) { index in
+        let date = items[index]
+        let isSelected = selectedIndex == index
+        let isToday = calendar.isDateInToday(date)
 
-            Button {
-              withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                selectedIndex = index
-                proxy.scrollTo(index, anchor: .center)
-              }
-            } label: {
-              DateCell(
-                dayOfMonth: calendar.component(.day, from: date),
-                weekdayText: weekdayText(for: date),
-                isSelected: isSelected,
-                isToday: isToday
-              )
-            }
-            .buttonStyle(.plain)
-            .id(index)
+        Button {
+          withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+            selectedIndex = index
           }
+        } label: {
+          DateCell(
+            dayOfMonth: calendar.component(.day, from: date),
+            weekdayText: weekdayText(for: date),
+            isSelected: isSelected,
+            isToday: isToday
+          )
         }
-        .padding(.horizontal)
-        .padding(.vertical, 8)
+        .buttonStyle(.plain)
+        .frame(maxWidth: .infinity)
       }
-      .onAppear {
-        if let index = items.firstIndex(where: { calendar.isDateInToday($0) }) {
-          selectedIndex = index
-          proxy.scrollTo(index, anchor: .center)
-        }
+    }
+    .padding(.horizontal, 15)
+    .padding(.vertical, 8)
+    .onAppear {
+      if let index = items.firstIndex(where: { calendar.isDateInToday($0) }) {
+        selectedIndex = index
       }
     }
   }
@@ -87,11 +81,12 @@ private struct DateCell: View {
         .foregroundStyle(isSelected ? .white : (isToday ? Color.accentColor : Color.primary))
 
       Text(weekdayText)
-        .font(.system(size: 14, weight: isSelected ? .medium : .regular))
+        .font(.system(size: 12, weight: isSelected ? .medium : .regular))
         .foregroundStyle(isSelected ? .white.opacity(0.9) : .secondary)
         .accessibilityHidden(true)
     }
-    .padding(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+    .padding(EdgeInsets(top: 8, leading: 10, bottom: 8, trailing: 10))
+    .frame(maxWidth: .infinity, minHeight: 72)
     .background(
       RoundedRectangle(cornerRadius: 12)
         .fill(isSelected ? Color.accentColor : Color(.secondarySystemGroupedBackground))
@@ -111,4 +106,17 @@ private struct DateCell: View {
     .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSelected)
     .accessibilityElement(children: .combine)
   }
+}
+
+#Preview("Date Selector") {
+  DateSelectorView(selectedIndex: .constant(2))
+    .padding(.horizontal)
+}
+
+#Preview("Date Cell States") {
+  HStack(spacing: 12) {
+    DateCell(dayOfMonth: 16, weekdayText: "Mon", isSelected: true, isToday: false)
+    DateCell(dayOfMonth: 17, weekdayText: "Tue", isSelected: false, isToday: true)
+  }
+  .padding()
 }

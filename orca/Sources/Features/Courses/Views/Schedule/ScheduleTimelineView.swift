@@ -181,3 +181,15 @@ private struct TimeSlotGrid: View {
     }
   }
 }
+
+#Preview("Timeline") {
+  ScheduleTimelineView(courses: AppPreviewData.mondayCourses, onCourseTap: { _ in })
+    .frame(height: ScheduleLayout.totalHeight)
+    .padding(.horizontal)
+}
+
+#Preview("Time Slot Grid") {
+  TimeSlotGrid(numberOfSlots: ScheduleLayout.slotCount, totalHeight: ScheduleLayout.totalHeight)
+    .frame(height: ScheduleLayout.totalHeight)
+    .padding(.horizontal)
+}

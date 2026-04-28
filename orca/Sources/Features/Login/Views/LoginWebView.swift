@@ -62,3 +62,7 @@ struct LoginWebView: UIViewRepresentable {
 
 private let loginURL = URL(string: "https://ilifeapp.az.tku.edu.tw")!
 private let sessionCookieName = ".AspNetCore.Cookies"
+
+#Preview {
+  LoginWebView(onLoginSuccess: { _ in })
+}

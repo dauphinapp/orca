@@ -38,3 +38,12 @@ struct EventEditSheet: UIViewControllerRepresentable {
     }
   }
 }
+
+#Preview {
+  let store = EKEventStore()
+  let event = EKEvent(eventStore: store)
+  event.title = "Preview Event"
+  event.startDate = Date()
+  event.endDate = Date().addingTimeInterval(60 * 60)
+  return EventEditSheet(eventStore: store, event: event)
+}

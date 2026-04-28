@@ -54,3 +54,12 @@ struct ScheduleCourseTile: View {
     )
   }
 }
+
+#Preview {
+  ScheduleCourseTile(
+    course: AppPreviewData.firstScheduledCourse,
+    height: 120,
+    yOffset: 8
+  )
+  .padding()
+}

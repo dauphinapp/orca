@@ -84,7 +84,7 @@ struct WeekScheduleView: View {
 
 #Preview {
   WeekScheduleView(
-    courses: previewCourses.scheduledCourses(),
+    courses: AppPreviewData.scheduledCourses,
     isLoadingCourses: false,
     courseErrorMessage: nil,
     cacheWarningMessage: nil

@@ -130,7 +130,7 @@ struct DayScheduleView: View {
 
 #Preview {
   DayScheduleView(
-    courses: previewCourses.scheduledCourses(),
+    courses: AppPreviewData.scheduledCourses,
     isLoadingCourses: false,
     courseErrorMessage: nil,
     cacheWarningMessage: nil

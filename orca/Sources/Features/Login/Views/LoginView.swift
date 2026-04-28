@@ -20,3 +20,11 @@ struct LoginView: View {
     }
   }
 }
+
+#Preview("Default") {
+  LoginView(errorMessage: nil, onLoginSuccess: { _ in })
+}
+
+#Preview("Error") {
+  LoginView(errorMessage: "Invalid session cookie", onLoginSuccess: { _ in })
+}

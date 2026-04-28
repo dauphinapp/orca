@@ -51,7 +51,7 @@ struct MainContentView: View {
 
 #Preview {
   MainContentView(
-    courses: previewCourses,
+    courses: AppPreviewData.courseSessions,
     isLoadingCourses: false,
     courseErrorMessage: nil,
     cacheWarningMessage: nil,

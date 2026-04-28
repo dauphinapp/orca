@@ -38,7 +38,7 @@ struct CourseScheduleView: View {
 
 #Preview {
   CourseScheduleView(
-    courses: previewCourses,
+    courses: AppPreviewData.courseSessions,
     isLoadingCourses: false,
     courseErrorMessage: nil,
     cacheWarningMessage: nil

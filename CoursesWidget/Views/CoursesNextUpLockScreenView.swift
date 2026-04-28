@@ -62,6 +62,7 @@ struct CoursesNextUpLockScreenView: View {
               Image(systemName: "location.circle")
                 .resizable()
                 .frame(width: 15, height: 15)
+                .padding(.trailing, 6)
               Text(upcoming.course.room)
                 .font(.system(size: 12))
             }
@@ -72,6 +73,7 @@ struct CoursesNextUpLockScreenView: View {
               Image(systemName: "graduationcap")
                 .resizable()
                 .frame(width: 15, height: 15)
+                .padding(.trailing, 6)
               Text(upcoming.course.seatNo)
                 .font(.system(size: 12))
             }
@@ -79,6 +81,7 @@ struct CoursesNextUpLockScreenView: View {
         }
       }
       .padding(.vertical, 16)
+      .padding(.horizontal,2)
       .containerBackground(for: .widget) {
         Color(UIColor.systemBackground)
       }
