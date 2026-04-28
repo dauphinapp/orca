@@ -39,7 +39,6 @@ struct OtherView: View {
               Label("Campus Map", systemImage: "map.fill")
             }
           }
-          .navigationTitle("Other")
         }
       }
     }

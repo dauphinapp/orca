@@ -22,7 +22,7 @@ struct DateSelectorView: View {
   }
 
   var body: some View {
-    HStack(spacing: 8) {
+    HStack(spacing: 10) {
       ForEach(items.indices, id: \.self) { index in
         let date = items[index]
         let isSelected = selectedIndex == index
@@ -49,7 +49,7 @@ struct DateSelectorView: View {
     .onAppear {
       selectInitialDateIndex()
     }
-    .onChange(of: showWeekendDays) { _ in
+    .onChange(of: showWeekendDays) {
       selectInitialDateIndex()
     }
   }
@@ -104,34 +104,29 @@ private struct DateCell: View {
   let isToday: Bool
 
   var body: some View {
-    VStack(spacing: 4) {
+    VStack(spacing: 3) {
       Text("\(dayOfMonth)")
-        .font(.system(size: 20, weight: isSelected ? .semibold : .regular))
+        .font(isSelected ? .title3.weight(.semibold) : .headline.weight(.regular))
         .foregroundStyle(isSelected ? .white : (isToday ? Color.accentColor : Color.primary))
 
       Text(weekdayText)
-        .font(.system(size: 12, weight: isSelected ? .medium : .regular))
+        .font(.caption)
         .foregroundStyle(isSelected ? .white.opacity(0.9) : .secondary)
         .accessibilityHidden(true)
     }
-    .padding(EdgeInsets(top: 8, leading: 10, bottom: 8, trailing: 10))
-    .frame(maxWidth: .infinity, minHeight: 72)
+    .padding(EdgeInsets(top: 7, leading: 10, bottom: 7, trailing: 10))
+    .frame(maxWidth: .infinity, minHeight: 66)
     .background(
-      RoundedRectangle(cornerRadius: 12)
-        .fill(isSelected ? Color.accentColor : Color(.secondarySystemGroupedBackground))
+      RoundedRectangle(cornerRadius: 18, style: .continuous)
+        .fill(isSelected ? AnyShapeStyle(Color.accentColor.opacity(0.9)) : AnyShapeStyle(.thinMaterial))
         .overlay(
-          RoundedRectangle(cornerRadius: 12)
+          RoundedRectangle(cornerRadius: 18, style: .continuous)
             .strokeBorder(
-              !isSelected && isToday ? Color.accentColor.opacity(0.3) : .clear,
-              lineWidth: 2
+              !isSelected && isToday ? Color.accentColor.opacity(0.25) : Color.white.opacity(0.08),
+              lineWidth: !isSelected && isToday ? 1.5 : 1
             )
         )
-        .shadow(
-          color: isSelected ? Color.accentColor.opacity(0.3) : .clear,
-          radius: isSelected ? 4 : 0
-        )
     )
-    .scaleEffect(isSelected ? 1.05 : 1.0)
     .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSelected)
     .accessibilityElement(children: .combine)
   }

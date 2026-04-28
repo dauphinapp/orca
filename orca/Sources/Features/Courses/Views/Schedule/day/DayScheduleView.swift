@@ -7,7 +7,6 @@ struct DayScheduleView: View {
   let cacheWarningMessage: String?
 
   @State private var selectedDateIndex = 0
-  @State private var selectedCourse: ScheduledCourse?
   @AppStorage(AppSettings.showEnglishCourseNameKey, store: AppSettings.appGroupDefaults)
   private var showEnglishCourseName = AppSettings.defaultShowEnglishName()
   @AppStorage(AppSettings.showEnglishTeacherNameKey, store: AppSettings.appGroupDefaults)
@@ -55,8 +54,8 @@ struct DayScheduleView: View {
       ScrollView {
         scheduleContent
       }
-      .gesture(
-        DragGesture().onEnded { value in
+      .simultaneousGesture(
+        DragGesture(minimumDistance: 30).onEnded { value in
           withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
             if value.translation.width < -50 {
               selectedDateIndex = min(selectedDateIndex + 1, maxSelectableDateIndex)
@@ -68,15 +67,10 @@ struct DayScheduleView: View {
       )
       .scrollIndicators(.hidden)
     }
-    .sheet(item: $selectedCourse) { course in
-      CourseDetailView(course: course)
-        .presentationDragIndicator(.visible)
-        .presentationDetents([.fraction(0.75), .large])
-    }
     .onAppear {
       selectedDateIndex = min(selectedDateIndex, maxSelectableDateIndex)
     }
-    .onChange(of: showWeekendDays) { _ in
+    .onChange(of: showWeekendDays) {
       selectedDateIndex = min(selectedDateIndex, maxSelectableDateIndex)
     }
   }
@@ -121,21 +115,24 @@ struct DayScheduleView: View {
     } else {
       LazyVStack(spacing: 12) {
         ForEach(selectedCourses) { course in
-          CourseCardView(
-            courseName: course.displayName(showEnglish: showEnglishCourseName),
-            useCompactCourseNameFont: course.isShowingEnglishName(
-              showEnglish: showEnglishCourseName
-            ),
-            roomNumber: course.room,
-            teacherName: course.displayTeacher(showEnglish: showEnglishTeacherName),
-            startTime: course.startTime,
-            endTime: course.endTime,
-            seatNo: course.seatNo
-          )
-          .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
-          .onTapGesture {
-            selectedCourse = course
+          NavigationLink {
+            CourseDetailView(course: course)
+          } label: {
+            CourseCardView(
+              courseName: course.displayName(showEnglish: showEnglishCourseName),
+              useCompactCourseNameFont: course.isShowingEnglishName(
+                showEnglish: showEnglishCourseName
+              ),
+              roomNumber: course.room,
+              teacherName: course.displayTeacher(showEnglish: showEnglishTeacherName),
+              startTime: course.startTime,
+              endTime: course.endTime,
+              seatNo: course.seatNo
+            )
+            .contentShape(Rectangle())
           }
+          .buttonStyle(.plain)
+          .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
         }
       }
       .padding(.horizontal)

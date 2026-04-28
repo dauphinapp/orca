@@ -1,8 +1,8 @@
 import SwiftUI
 
-struct ScheduleTimelineView: View {
+struct ScheduleTimelineView<Destination: View>: View {
   let courses: [ScheduledCourse]
-  var onCourseTap: (ScheduledCourse) -> Void
+  @ViewBuilder var destination: (ScheduledCourse) -> Destination
   var overlapGap: CGFloat = 2
   var verticalGap: CGFloat = 2
 
@@ -92,12 +92,15 @@ struct ScheduleTimelineView: View {
             )
             let yOffset = yPosition(for: courseStart, in: totalHeight) + vGap / 2
 
-            ScheduleCourseTile(course: position.course, height: cardHeight, yOffset: yOffset)
-              .frame(width: courseWidth)
-              .offset(x: xOffset)
-              .onTapGesture {
-                onCourseTap(position.course)
-              }
+            NavigationLink {
+              destination(position.course)
+            } label: {
+              ScheduleCourseTile(course: position.course, height: cardHeight)
+                .contentShape(Rectangle())
+            }
+            .frame(width: courseWidth, height: cardHeight)
+            .position(x: xOffset + courseWidth / 2, y: yOffset + cardHeight / 2)
+            .buttonStyle(.plain)
           }
           .frame(height: totalHeight)
         }
@@ -175,7 +178,7 @@ private struct TimeSlotGrid: View {
     VStack(spacing: 0) {
       ForEach(0..<numberOfSlots, id: \.self) { _ in
         Rectangle()
-          .stroke(Color.gray.opacity(0.4), lineWidth: 0.3)
+          .stroke(Color.gray.opacity(0.2), lineWidth: 0.3)
           .frame(height: totalHeight / CGFloat(numberOfSlots))
       }
     }
@@ -183,7 +186,9 @@ private struct TimeSlotGrid: View {
 }
 
 #Preview("Timeline") {
-  ScheduleTimelineView(courses: AppPreviewData.mondayCourses, onCourseTap: { _ in })
+  ScheduleTimelineView(courses: AppPreviewData.mondayCourses) { course in
+    CourseDetailView(course: course)
+  }
     .frame(height: ScheduleLayout.totalHeight)
     .padding(.horizontal)
 }

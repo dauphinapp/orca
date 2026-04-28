@@ -31,8 +31,6 @@ struct CourseScheduleView: View {
         .padding(.horizontal, 15)
       }
     }
-    .navigationTitle("Courses")
-    .navigationBarTitleDisplayMode(.inline)
   }
 }
 

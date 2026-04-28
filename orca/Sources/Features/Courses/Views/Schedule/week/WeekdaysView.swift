@@ -18,9 +18,10 @@ struct WeekdaysView: View {
     let isToday = weekdayValue == currentWeekday
 
     return Text(label)
-      .font(.system(size: 12, weight: isToday ? .semibold : .medium))
-      .foregroundStyle(isToday ? Color.blue : Color(.tertiaryLabel))
-      .frame(maxWidth: .infinity, minHeight: 20)
+      .font(.caption)
+      .fontWeight(isToday ? .semibold : .regular)
+      .foregroundStyle(isToday ? Color.accentColor : Color.secondary)
+      .frame(maxWidth: .infinity, minHeight: 22)
   }
 }
 

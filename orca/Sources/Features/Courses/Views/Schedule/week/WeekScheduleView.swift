@@ -6,8 +6,6 @@ struct WeekScheduleView: View {
   let courseErrorMessage: String?
   let cacheWarningMessage: String?
 
-  @State private var selectedCourse: ScheduledCourse?
-
   private var normalizedCurrentWeekday: Int {
     let systemWeekday = Calendar.current.component(.weekday, from: Date())
     return systemWeekday == 1 ? 7 : systemWeekday - 1
@@ -50,10 +48,6 @@ struct WeekScheduleView: View {
         }
       }
     }
-    .sheet(item: $selectedCourse) { course in
-      CourseDetailView(course: course)
-        .presentationDragIndicator(.visible)
-    }
   }
 
   private func scheduleGrid(width _: CGFloat) -> some View {
@@ -71,7 +65,7 @@ struct WeekScheduleView: View {
         HStack(spacing: 0) {
           ForEach(Array(filteredCourses.enumerated()), id: \.offset) { _, dayCourses in
             ScheduleTimelineView(courses: dayCourses) { course in
-              selectedCourse = course
+              CourseDetailView(course: course)
             }
             .frame(maxWidth: .infinity)
           }

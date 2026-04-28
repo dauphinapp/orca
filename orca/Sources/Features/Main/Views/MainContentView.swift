@@ -17,6 +17,8 @@ struct MainContentView: View {
           courseErrorMessage: courseErrorMessage,
           cacheWarningMessage: cacheWarningMessage
         )
+        .navigationTitle("Courses")
+        .toolbarTitleDisplayMode(.inlineLarge)
         .task {
           await onTask()
         }
@@ -28,12 +30,16 @@ struct MainContentView: View {
       NavigationStack {
         LibraryView()
           .navigationTitle("Library")
+          .toolbarTitleDisplayMode(.inlineLarge)
       }
       .tabItem {
         Label("Library", systemImage: "books.vertical")
       }
-
-      OtherView()
+      NavigationStack {
+        OtherView()
+          .navigationTitle("Other")
+          .toolbarTitleDisplayMode(.inlineLarge)
+      }
       .tabItem {
         Label("Other", systemImage: "square.grid.2x2")
       }
@@ -41,6 +47,7 @@ struct MainContentView: View {
       NavigationStack {
         SettingsView(onLogout: onLogout)
           .navigationTitle("Settings")
+          .toolbarTitleDisplayMode(.inlineLarge)
       }
       .tabItem {
         Label("Settings", systemImage: "gearshape")

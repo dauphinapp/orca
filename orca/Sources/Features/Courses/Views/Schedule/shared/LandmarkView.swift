@@ -5,14 +5,10 @@ struct LandmarkView: View {
   let coordinate: CLLocationCoordinate2D
 
   @Environment(\.openURL) private var openURL
-  @State private var lookAroundScene: MKLookAroundScene?
 
   var body: some View {
-    VStack(spacing: 16) {
-      HStack(spacing: 12) {
-        mapPreview
-        lookAroundPreview
-      }
+    VStack(spacing: 14) {
+      mapPreview
 
       Button {
         openDirections()
@@ -24,8 +20,12 @@ struct LandmarkView: View {
         .frame(maxWidth: .infinity)
       }
       .buttonStyle(.borderedProminent)
+      .controlSize(.large)
       .accessibilityIdentifier("map.action.directions")
     }
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .padding(18)
+    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
   }
 
   private var mapPreview: some View {
@@ -43,19 +43,10 @@ struct LandmarkView: View {
           .accessibilityHidden(true)
       }
     }
-    .aspectRatio(1, contentMode: .fit)
-    .clipShape(RoundedRectangle(cornerRadius: 12))
+    .frame(maxWidth: .infinity)
+    .frame(height: 200)
+    .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
     .accessibilityLabel(Text("Campus Map"))
-  }
-
-  private var lookAroundPreview: some View {
-    LookAroundPreview(scene: $lookAroundScene, allowsNavigation: true, showsRoadLabels: true)
-      .aspectRatio(1, contentMode: .fit)
-      .clipShape(.rect(cornerRadius: 12))
-      .task {
-        let request = MKLookAroundSceneRequest(coordinate: coordinate)
-        lookAroundScene = try? await request.scene
-      }
   }
 
   private func openDirections() {

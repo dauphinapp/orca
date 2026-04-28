@@ -3,54 +3,49 @@ import SwiftUI
 struct ScheduleCourseTile: View {
   let course: ScheduledCourse
   let height: CGFloat
-  let yOffset: CGFloat
 
   @AppStorage(AppSettings.showEnglishCourseNameKey, store: AppSettings.appGroupDefaults)
   private var showEnglishCourseName = AppSettings.defaultShowEnglishName()
 
-  private var courseNameFontSize: CGFloat {
-    course.isShowingEnglishName(showEnglish: showEnglishCourseName) ? 13 : 15
-  }
-
   var body: some View {
-    RoundedRectangle(cornerRadius: 8)
-      .fill(Color(.secondarySystemBackground))
+    RoundedRectangle(cornerRadius: 12, style: .continuous)
+      .fill(.ultraThinMaterial)
       .overlay(
-        RoundedRectangle(cornerRadius: 8)
-          .stroke(Color(.separator), lineWidth: 1)
+        RoundedRectangle(cornerRadius: 12, style: .continuous)
+          .stroke(Color.white.opacity(0.1), lineWidth: 1)
       )
       .frame(height: height)
       .overlay(alignment: .topLeading) {
-        VStack(alignment: .leading, spacing: 3) {
+        VStack(alignment: .leading, spacing: 4) {
           Text(course.displayName(showEnglish: showEnglishCourseName))
-            .font(.system(size: courseNameFontSize, weight: .semibold))
+            .font(course.isShowingEnglishName(showEnglish: showEnglishCourseName) ? .footnote : .subheadline)
+            .fontWeight(.semibold)
             .foregroundStyle(Color(.label))
             .lineLimit(2)
 
           badge(systemImage: "location.circle.fill", text: course.room, color: .purple)
           badge(systemImage: "graduationcap.fill", text: course.seatNo, color: .orange)
         }
-        .padding(8)
+        .padding(7)
       }
-      .offset(y: yOffset)
       .padding(.horizontal, 2)
   }
 
   private func badge(systemImage: String, text: String, color: Color) -> some View {
-    HStack(spacing: 2) {
+    HStack(spacing: 3) {
       Image(systemName: systemImage)
-        .font(.system(size: 10))
-        .foregroundStyle(color)
+        .font(.caption2)
+        .foregroundStyle(color.opacity(0.9))
       Text(text)
-        .font(.system(size: 10, weight: .medium))
+        .font(.caption2)
         .foregroundStyle(.primary)
         .lineLimit(1)
     }
-    .padding(.horizontal, 4)
-    .padding(.vertical, 2)
+    .padding(.horizontal, 5)
+    .padding(.vertical, 3)
     .background(
-      RoundedRectangle(cornerRadius: 8)
-        .fill(color.opacity(0.15))
+      Capsule()
+        .fill(color.opacity(0.18))
     )
   }
 }
@@ -58,8 +53,7 @@ struct ScheduleCourseTile: View {
 #Preview {
   ScheduleCourseTile(
     course: AppPreviewData.firstScheduledCourse,
-    height: 120,
-    yOffset: 8
+    height: 120
   )
   .padding()
 }

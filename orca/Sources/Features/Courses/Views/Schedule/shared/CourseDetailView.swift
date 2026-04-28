@@ -3,7 +3,6 @@ import SwiftUI
 struct CourseDetailView: View {
   let course: ScheduledCourse
 
-  @Environment(\.dismiss) private var dismiss
   @AppStorage(AppSettings.showEnglishCourseNameKey, store: AppSettings.appGroupDefaults)
   private var showEnglishCourseName = AppSettings.defaultShowEnglishName()
   @AppStorage(AppSettings.showEnglishTeacherNameKey, store: AppSettings.appGroupDefaults)
@@ -40,45 +39,41 @@ struct CourseDetailView: View {
   }()
 
   var body: some View {
-    NavigationStack {
-      ScrollView {
-        VStack(alignment: .leading, spacing: 10) {
+    ScrollView {
+      VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: 20) {
           detailRow(title: "Time", content: timeRange, subcontent: dayOfWeek)
-          Divider()
           detailRow(title: "Location", content: course.room)
-          Divider()
           detailRow(title: "Seat Number", content: course.seatNo)
-          Divider()
           detailRow(
             title: "Instructor",
             content: course.displayTeacher(showEnglish: showEnglishTeacherName)
           )
 
           if !course.note.isEmpty {
-            Divider()
             detailRow(title: "Note", content: course.note, isNote: true)
           }
-
-          LandmarkView(coordinate: CampusLocations.coordinate(forRoom: course.room))
-            .padding(.top, 8)
         }
-        .padding(24)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(20)
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
+
+        LandmarkView(coordinate: CampusLocations.coordinate(forRoom: course.room))
+          .frame(maxWidth: .infinity, alignment: .leading)
+          .padding(.top, 8)
       }
-      .navigationBarTitleDisplayMode(.inline)
-      .toolbar {
-        ToolbarItem(placement: .principal) {
-          Text(displayName)
-            .font(.system(size: useCompactTitle ? 15 : 17, weight: .semibold))
-            .lineLimit(1)
-        }
-
-        ToolbarItem(placement: .topBarTrailing) {
-          Button {
-            dismiss()
-          } label: {
-            Image(systemName: "xmark")
-          }
-        }
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .padding(.horizontal, 20)
+      .padding(.vertical, 16)
+    }
+    .background(Color(.systemGroupedBackground).ignoresSafeArea())
+    .navigationBarTitleDisplayMode(.inline)
+    .toolbar {
+      ToolbarItem(placement: .principal) {
+        Text(displayName)
+          .font(useCompactTitle ? .subheadline : .headline)
+          .fontWeight(.semibold)
+          .lineLimit(1)
       }
     }
   }
@@ -89,7 +84,7 @@ struct CourseDetailView: View {
     subcontent: String? = nil,
     isNote: Bool = false
   ) -> some View {
-    VStack(alignment: .leading, spacing: 4) {
+    VStack(alignment: .leading, spacing: 6) {
       Text(title)
         .font(.caption)
         .foregroundStyle(.secondary)
@@ -101,13 +96,16 @@ struct CourseDetailView: View {
       }
 
       Text(content)
-        .font(.system(size: isNote ? 14 : 16, weight: isNote ? .regular : .medium))
+        .font(isNote ? .footnote : .body)
+        .fontWeight(isNote ? .regular : .semibold)
         .foregroundStyle(Color(.label))
-        .fixedSize(horizontal: false, vertical: isNote)
+        .fixedSize(horizontal: false, vertical: true)
     }
   }
 }
 
 #Preview {
-  CourseDetailView(course: AppPreviewData.firstScheduledCourse)
+  NavigationStack {
+    CourseDetailView(course: AppPreviewData.firstScheduledCourse)
+  }
 }
