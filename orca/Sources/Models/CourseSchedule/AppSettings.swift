@@ -4,6 +4,7 @@ enum AppSettings {
   static let appGroupSuiteName = "group.cantpr09ram.dauphin"
   static let showEnglishCourseNameKey = "showEnglishCourseName"
   static let showEnglishTeacherNameKey = "showEnglishTeacherName"
+  static let showWeekendDaysKey = "showWeekendDays"
   static let eventCalendarEndpoint = "https://ilifeapi.az.tku.edu.tw/data/xml_cal.ashx"
 
   static var appGroupDefaults: UserDefaults {
@@ -36,5 +37,9 @@ enum AppSettings {
       || normalized.hasPrefix("zh-mo")
 
     return !isTraditionalChinese
+  }
+
+  static func defaultShowWeekendDays() -> Bool {
+    false
   }
 }

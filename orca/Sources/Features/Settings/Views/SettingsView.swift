@@ -7,6 +7,8 @@ struct SettingsView: View {
   private var showEnglishCourseName = AppSettings.defaultShowEnglishName()
   @AppStorage(AppSettings.showEnglishTeacherNameKey, store: AppSettings.appGroupDefaults)
   private var showEnglishTeacherName = AppSettings.defaultShowEnglishName()
+  @AppStorage(AppSettings.showWeekendDaysKey, store: AppSettings.appGroupDefaults)
+  private var showWeekendDays = AppSettings.defaultShowWeekendDays()
 
   var body: some View {
     List {
@@ -17,6 +19,10 @@ struct SettingsView: View {
 
         Toggle(isOn: $showEnglishTeacherName) {
           Label("Show English Teacher Name", systemImage: "person.text.rectangle")
+        }
+
+        Toggle(isOn: $showWeekendDays) {
+          Label("Show Weekend Days", systemImage: "calendar")
         }
       } header: {
         Text("Courses")

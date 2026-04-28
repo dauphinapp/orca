@@ -12,6 +12,8 @@ struct DayScheduleView: View {
   private var showEnglishCourseName = AppSettings.defaultShowEnglishName()
   @AppStorage(AppSettings.showEnglishTeacherNameKey, store: AppSettings.appGroupDefaults)
   private var showEnglishTeacherName = AppSettings.defaultShowEnglishName()
+  @AppStorage(AppSettings.showWeekendDaysKey, store: AppSettings.appGroupDefaults)
+  private var showWeekendDays = AppSettings.defaultShowWeekendDays()
 
   private var monthYearText: String {
     Date.now.formatted(
@@ -22,9 +24,17 @@ struct DayScheduleView: View {
     )
   }
 
+  private var maxSelectableDateIndex: Int {
+    showWeekendDays ? 6 : 4
+  }
+
+  private var selectedWeekday: Int {
+    showWeekendDays ? selectedDateIndex + 1 : min(selectedDateIndex + 1, 5)
+  }
+
   private var selectedCourses: [ScheduledCourse] {
     courses
-      .filter { $0.weekday == selectedDateIndex + 1 }
+      .filter { $0.weekday == selectedWeekday }
       .sorted { $0.startTime < $1.startTime }
   }
 
@@ -49,7 +59,7 @@ struct DayScheduleView: View {
         DragGesture().onEnded { value in
           withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
             if value.translation.width < -50 {
-              selectedDateIndex = min(selectedDateIndex + 1, 6)
+              selectedDateIndex = min(selectedDateIndex + 1, maxSelectableDateIndex)
             } else if value.translation.width > 50 {
               selectedDateIndex = max(selectedDateIndex - 1, 0)
             }
@@ -62,6 +72,12 @@ struct DayScheduleView: View {
       CourseDetailView(course: course)
         .presentationDragIndicator(.visible)
         .presentationDetents([.fraction(0.75), .large])
+    }
+    .onAppear {
+      selectedDateIndex = min(selectedDateIndex, maxSelectableDateIndex)
+    }
+    .onChange(of: showWeekendDays) { _ in
+      selectedDateIndex = min(selectedDateIndex, maxSelectableDateIndex)
     }
   }
 

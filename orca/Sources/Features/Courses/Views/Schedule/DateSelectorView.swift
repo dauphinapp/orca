@@ -2,16 +2,23 @@ import SwiftUI
 
 struct DateSelectorView: View {
   @Binding var selectedIndex: Int
+  @AppStorage(AppSettings.showWeekendDaysKey, store: AppSettings.appGroupDefaults)
+  private var showWeekendDays = AppSettings.defaultShowWeekendDays()
 
   private let calendar: Calendar
-  private let items: [Date]
+
+  private var items: [Date] {
+    Self.buildCurrentWeek(
+      calendar: calendar,
+      showWeekendDays: showWeekendDays
+    )
+  }
 
   init(selectedIndex: Binding<Int>, calendar: Calendar = Calendar(identifier: .gregorian)) {
     self._selectedIndex = selectedIndex
     var calendar = calendar
     calendar.locale = .autoupdatingCurrent
     self.calendar = calendar
-    self.items = Self.buildCurrentWeek(calendar: calendar)
   }
 
   var body: some View {
@@ -40,9 +47,10 @@ struct DateSelectorView: View {
     .padding(.horizontal, 15)
     .padding(.vertical, 8)
     .onAppear {
-      if let index = items.firstIndex(where: { calendar.isDateInToday($0) }) {
-        selectedIndex = index
-      }
+      selectInitialDateIndex()
+    }
+    .onChange(of: showWeekendDays) { _ in
+      selectInitialDateIndex()
     }
   }
 
@@ -56,14 +64,35 @@ struct DateSelectorView: View {
     return symbols[weekday - 1]
   }
 
-  static func buildCurrentWeek(calendar: Calendar = Calendar(identifier: .gregorian)) -> [Date] {
+  private func selectInitialDateIndex() {
+    if let index = items.firstIndex(where: { calendar.isDateInToday($0) }) {
+      selectedIndex = index
+      return
+    }
+
+    selectedIndex = min(selectedIndex, max(items.count - 1, 0))
+  }
+
+  static func buildCurrentWeek(
+    calendar: Calendar = Calendar(identifier: .gregorian),
+    showWeekendDays: Bool = true
+  ) -> [Date] {
     let today = calendar.startOfDay(for: Date())
     let weekday = calendar.component(.weekday, from: today)
     let daysFromMonday = (weekday + 5) % 7
     let monday = calendar.date(byAdding: .day, value: -daysFromMonday, to: today) ?? today
 
-    return (0..<7).compactMap { offset in
+    let fullWeek = (0..<7).compactMap { offset in
       calendar.date(byAdding: .day, value: offset, to: monday)
+    }
+
+    guard !showWeekendDays else {
+      return fullWeek
+    }
+
+    return fullWeek.filter { date in
+      let weekday = calendar.component(.weekday, from: date)
+      return (2...6).contains(weekday)
     }
   }
 }
