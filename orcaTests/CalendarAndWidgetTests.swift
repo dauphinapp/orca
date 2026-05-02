@@ -187,6 +187,68 @@ struct CalendarAndWidgetTests {
     let loadedCache = try store.load()
     #expect(loadedCache == nil)
   }
+
+  @Test
+  func watchCoursePayloadRoundTripsThroughCourseCacheCoding() throws {
+    let payload = WatchCoursePayload(
+      cache: CourseCache(updatedAt: Date(), courses: [widgetSampleCourse]),
+      showEnglishCourseName: true,
+      showEnglishTeacherName: false
+    )
+
+    let data = try JSONEncoder.courseCache.encode(payload)
+    let decodedPayload = try JSONDecoder.courseCache.decode(WatchCoursePayload.self, from: data)
+
+    #expect(decodedPayload == payload)
+  }
+
+  @Test
+  func scheduledCoursesSortForWatchWeekList() {
+    let tuesdayEarly = CourseSession(
+      weekno: "2",
+      sessno: "03",
+      week: "二",
+      sesstime: "10:10",
+      seatno: "016",
+      chCosName: "資料結構",
+      enCosName: "DATA STRUCTURES",
+      teachName: "林教授",
+      teachNameEn: "PROF. LIN",
+      note: "",
+      room: "B 713"
+    )
+    let mondayLate = CourseSession(
+      weekno: "1",
+      sessno: "08",
+      week: "一",
+      sesstime: "15:10",
+      seatno: "009",
+      chCosName: "模糊理論",
+      enCosName: "FUZZY THEORY",
+      teachName: "翁慶昌",
+      teachNameEn: "WONG CHING-CHANG",
+      note: "",
+      room: "E 414"
+    )
+    let mondayEarly = CourseSession(
+      weekno: "1",
+      sessno: "06",
+      week: "一",
+      sesstime: "13:10",
+      seatno: "010",
+      chCosName: "線性代數",
+      enCosName: "LINEAR ALGEBRA",
+      teachName: "陳教授",
+      teachNameEn: "PROF. CHEN",
+      note: "",
+      room: "S 101"
+    )
+
+    let courses = [tuesdayEarly, mondayLate, mondayEarly].scheduledCourses()
+
+    #expect(courses.map(\.name) == ["線性代數", "模糊理論", "資料結構"])
+    #expect(courses.map(\.weekday) == [1, 1, 2])
+  }
 }
 
 private let widgetSampleCourse = CourseSession(

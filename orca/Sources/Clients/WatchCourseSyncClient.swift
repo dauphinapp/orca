@@ -40,7 +40,7 @@ extension DependencyValues {
     static let shared = WatchCourseSyncService()
 
     private let encoder = JSONEncoder()
-    private var pendingCache: CourseCache?
+    private var pendingPayload: WatchCoursePayload?
 
     private override init() {
       encoder.dateEncodingStrategy = .iso8601
@@ -52,7 +52,17 @@ extension DependencyValues {
         return
       }
 
-      pendingCache = cache
+      pendingPayload = WatchCoursePayload(
+        cache: cache,
+        showEnglishCourseName: preference(
+          key: AppSettings.showEnglishCourseNameKey,
+          defaultValue: AppSettings.defaultShowEnglishName()
+        ),
+        showEnglishTeacherName: preference(
+          key: AppSettings.showEnglishTeacherNameKey,
+          defaultValue: AppSettings.defaultShowEnglishName()
+        )
+      )
 
       let session = WCSession.default
       if session.activationState == .notActivated {
@@ -69,17 +79,25 @@ extension DependencyValues {
         return
       }
 
-      guard let pendingCache, let data = try? encoder.encode(pendingCache) else {
+      guard let pendingPayload, let data = try? encoder.encode(pendingPayload) else {
         return
       }
 
-      let payload = ["courseCache": data]
+      let payload = ["coursePayload": data]
       if session.isPaired, session.isWatchAppInstalled {
         do {
           try session.updateApplicationContext(payload)
-          self.pendingCache = nil
+          self.pendingPayload = nil
         } catch {}
       }
+    }
+
+    private func preference(key: String, defaultValue: Bool) -> Bool {
+      if AppSettings.appGroupDefaults.object(forKey: key) == nil {
+        return defaultValue
+      }
+
+      return AppSettings.appGroupDefaults.bool(forKey: key)
     }
 
     nonisolated func session(
@@ -100,6 +118,23 @@ extension DependencyValues {
 
     nonisolated func sessionDidDeactivate(_ session: WCSession) {
       session.activate()
+    }
+
+    nonisolated func session(
+      _ session: WCSession,
+      didReceiveMessage message: [String: Any]
+    ) {
+      guard message["requestCourseCache"] as? Bool == true else {
+        return
+      }
+
+      Task { @MainActor in
+        guard let cache = try? CourseCacheStore.live.load() else {
+          return
+        }
+
+        self.sync(cache)
+      }
     }
   }
 #endif

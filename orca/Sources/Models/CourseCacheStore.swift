@@ -64,7 +64,16 @@ enum CourseCacheStoreError: LocalizedError {
 }
 
 extension CourseCacheStore {
-  static var live: Self { Self() }
+  static var live: Self {
+    #if DEBUG
+      Self(fallbackDirectory: FileManager.default.urls(
+        for: .applicationSupportDirectory,
+        in: .userDomainMask
+      ).first)
+    #else
+      Self()
+    #endif
+  }
 }
 
 extension JSONEncoder {

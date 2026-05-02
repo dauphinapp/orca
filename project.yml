@@ -3,6 +3,7 @@ options:
   bundleIdPrefix: cantpr09ram.dauphin
   deploymentTarget:
     iOS: "17.0"
+    watchOS: "10.0"
   developmentLanguage: en
   fileTypes:
     icon:
@@ -44,6 +45,8 @@ targets:
       - package: Perception
         product: PerceptionCore
       - target: CoursesWidgetExtension
+        embed: true
+      - target: DauphinWatchApp
         embed: true
     settings:
       base:
@@ -92,6 +95,26 @@ targets:
         INFOPLIST_FILE: CoursesWidget/Info.plist
         CODE_SIGN_ENTITLEMENTS: CoursesWidget/CoursesWidget.entitlements
         SKIP_INSTALL: YES
+  DauphinWatchApp:
+    type: application
+    platform: watchOS
+    sources:
+      - path: DauphinWatchApp/Sources
+      - path: orca/Sources/Models/CourseCache.swift
+      - path: orca/Sources/Models/CourseCacheStore.swift
+      - path: orca/Sources/Models/CourseSession.swift
+      - path: orca/Sources/Models/DisplayedCourse.swift
+      - path: orca/Sources/Models/WatchCoursePayload.swift
+      - path: orca/Sources/Models/CourseSchedule/AppSettings.swift
+      - path: orca/Sources/Models/CourseSchedule/ScheduledCourse.swift
+    settings:
+      base:
+        PRODUCT_NAME: DauphinWatchApp
+        PRODUCT_MODULE_NAME: DauphinWatchApp
+        PRODUCT_BUNDLE_IDENTIFIER: cantpr09ram.dauphin.watchkitapp
+        INFOPLIST_FILE: DauphinWatchApp/Resources/Info.plist
+        CODE_SIGN_ENTITLEMENTS: DauphinWatchApp/Resources/DauphinWatchApp.entitlements
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
 schemes:
   orca:
     build:

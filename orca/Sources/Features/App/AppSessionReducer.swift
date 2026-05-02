@@ -29,7 +29,7 @@ extension AppFeature {
       } else {
         state.destination = .onboarding
       }
-      return .none
+      return syncCachedCoursesToWatch()
 
     case .getStartedTapped:
       state.destination = .login
@@ -60,7 +60,7 @@ extension AppFeature {
       state.sessionCookie = sessionCookie
       state.hasStartedCourseLoad = false
       state.loginErrorMessage = nil
-      return .none
+      return syncCachedCoursesToWatch()
 
     case .sessionSaveFailed(let message):
       state.destination = .login
@@ -95,5 +95,15 @@ extension AppFeature {
     state.courseErrorMessage = nil
     state.cacheWarningMessage = nil
     state.courses = []
+  }
+
+  private func syncCachedCoursesToWatch() -> Effect<Action> {
+    .run { _ in
+      guard let cache = try? await courseCacheClient.load() else {
+        return
+      }
+
+      await watchCourseSyncClient.sync(cache)
+    }
   }
 }
