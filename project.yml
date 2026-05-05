@@ -99,7 +99,7 @@ targets:
       base:
         PRODUCT_NAME: Widgets
         PRODUCT_MODULE_NAME: Widgets
-        PRODUCT_BUNDLE_IDENTIFIER: cantpr09ram.dauphin.Widgets
+        PRODUCT_BUNDLE_IDENTIFIER: cantpr09ram.dauphin.CoursesWidget
         INFOPLIST_FILE: Widgets/Info.plist
         CODE_SIGN_ENTITLEMENTS: Widgets/Widgets.entitlements
         SKIP_INSTALL: YES
