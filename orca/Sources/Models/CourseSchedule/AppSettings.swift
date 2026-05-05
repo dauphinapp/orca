@@ -2,6 +2,7 @@ import Foundation
 
 enum AppSettings {
   static let appGroupSuiteName = "group.cantpr09ram.dauphin"
+  static let widgetIsLoggedInKey = "widgetIsLoggedIn"
   static let showEnglishCourseNameKey = "showEnglishCourseName"
   static let showEnglishTeacherNameKey = "showEnglishTeacherName"
   static let showWeekendDaysKey = "showWeekendDays"
@@ -17,6 +18,10 @@ enum AppSettings {
     }
 
     return !courseCache.courses.isEmpty
+  }
+
+  static func hasActiveWidgetSession() -> Bool {
+    appGroupDefaults.bool(forKey: widgetIsLoggedInKey)
   }
 
   static func defaultShowEnglishName(

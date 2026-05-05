@@ -5,6 +5,8 @@ struct AppFeature {
   @Dependency(\.authClient) var authClient
   @Dependency(\.courseClient) var courseClient
   @Dependency(\.courseCacheClient) var courseCacheClient
+  @Dependency(\.studentIDClient) var studentIDClient
+  @Dependency(\.studentIDStoreClient) var studentIDStoreClient
   @Dependency(\.watchCourseSyncClient) var watchCourseSyncClient
   @Dependency(\.widgetTimelineClient) var widgetTimelineClient
 

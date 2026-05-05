@@ -30,6 +30,12 @@ extension AppFeature {
           await send(.cacheSyncFailed(error.localizedDescription))
         }
         await watchCourseSyncClient.sync(cache)
+        do {
+          let studentID = try await studentIDClient.fetchStudentID(sessionCookie)
+          let record = StudentIDRecord(updatedAt: Date(), studentID: studentID)
+          try await studentIDStoreClient.save(record)
+          await widgetTimelineClient.reloadStudentIDWidget()
+        } catch {}
         await send(.coursesLoaded(courses))
       } catch CourseClientError.unauthorized {
         await send(.apiUnauthorized)

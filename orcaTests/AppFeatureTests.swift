@@ -138,6 +138,8 @@ struct AppFeatureTests {
     let savedCache = CourseCacheBox()
     let syncedCache = CourseCacheBox()
     let didReloadWidget = BoolBox()
+    let savedStudentID = StringBox()
+    let didReloadStudentIDWidget = BoolBox()
 
     let store = TestStore(
       initialState: AppFeature.State(
@@ -161,6 +163,16 @@ struct AppFeatureTests {
       $0.widgetTimelineClient.reloadCoursesWidget = {
         await didReloadWidget.set(true)
       }
+      $0.studentIDClient.fetchStudentID = { cookie in
+        #expect(cookie == "session-value")
+        return "123456789"
+      }
+      $0.studentIDStoreClient.save = { record in
+        await savedStudentID.set(record.studentID)
+      }
+      $0.widgetTimelineClient.reloadStudentIDWidget = {
+        await didReloadStudentIDWidget.set(true)
+      }
     }
 
     await store.send(.contentTask) {
@@ -175,12 +187,15 @@ struct AppFeatureTests {
     #expect(await savedCache.value?.courses == [sampleCourse])
     #expect(await syncedCache.value?.courses == [sampleCourse])
     #expect(await didReloadWidget.value == true)
+    #expect(await savedStudentID.value == "123456789")
+    #expect(await didReloadStudentIDWidget.value == true)
   }
 
   @Test
   func contentTaskKeepsCoursesWhenCacheSaveFails() async {
     let syncedCache = CourseCacheBox()
     let didReloadWidget = BoolBox()
+    let savedStudentID = StringBox()
     let store = TestStore(
       initialState: AppFeature.State(
         destination: .content,
@@ -200,6 +215,9 @@ struct AppFeatureTests {
       $0.widgetTimelineClient.reloadCoursesWidget = {
         await didReloadWidget.set(true)
       }
+      $0.studentIDStoreClient.save = { record in
+        await savedStudentID.set(record.studentID)
+      }
     }
 
     await store.send(.contentTask) {
@@ -216,6 +234,51 @@ struct AppFeatureTests {
 
     #expect(await syncedCache.value?.courses == [sampleCourse])
     #expect(await didReloadWidget.value == false)
+    #expect(await savedStudentID.value == "123456789")
+  }
+
+  @Test
+  func contentTaskKeepsCoursesWhenStudentIDSyncFails() async {
+    let savedCache = CourseCacheBox()
+    let didReloadCoursesWidget = BoolBox()
+    let didReloadStudentIDWidget = BoolBox()
+
+    let store = TestStore(
+      initialState: AppFeature.State(
+        destination: .content,
+        sessionCookie: "session-value",
+        isLoadingSession: false
+      )
+    ) {
+      AppFeature()
+    } withDependencies: {
+      $0.courseClient.fetchCourses = { _ in [sampleCourse] }
+      $0.courseCacheClient.save = { cache in
+        await savedCache.set(cache)
+      }
+      $0.studentIDClient.fetchStudentID = { _ in
+        throw TestError()
+      }
+      $0.widgetTimelineClient.reloadCoursesWidget = {
+        await didReloadCoursesWidget.set(true)
+      }
+      $0.widgetTimelineClient.reloadStudentIDWidget = {
+        await didReloadStudentIDWidget.set(true)
+      }
+    }
+
+    await store.send(.contentTask) {
+      $0.hasStartedCourseLoad = true
+      $0.isLoadingCourses = true
+    }
+    await store.receive(.coursesLoaded([sampleCourse])) {
+      $0.courses = [sampleCourse]
+      $0.isLoadingCourses = false
+    }
+
+    #expect(await savedCache.value?.courses == [sampleCourse])
+    #expect(await didReloadCoursesWidget.value == true)
+    #expect(await didReloadStudentIDWidget.value == false)
   }
 
   @Test
@@ -249,6 +312,8 @@ struct AppFeatureTests {
   func contentTaskUnauthorizedReturnsToOnboarding() async {
     let didClear = BoolBox()
     let didReloadWidget = BoolBox()
+    let didClearStudentID = BoolBox()
+    let didReloadStudentIDWidget = BoolBox()
     let store = TestStore(
       initialState: AppFeature.State(
         destination: .content,
@@ -264,8 +329,14 @@ struct AppFeatureTests {
       $0.authClient.clearSessionCookie = {
         await didClear.set(true)
       }
+      $0.studentIDStoreClient.clear = {
+        await didClearStudentID.set(true)
+      }
       $0.widgetTimelineClient.reloadCoursesWidget = {
         await didReloadWidget.set(true)
+      }
+      $0.widgetTimelineClient.reloadStudentIDWidget = {
+        await didReloadStudentIDWidget.set(true)
       }
     }
 
@@ -284,6 +355,8 @@ struct AppFeatureTests {
 
     #expect(await didClear.value == true)
     #expect(await didReloadWidget.value == true)
+    #expect(await didClearStudentID.value == true)
+    #expect(await didReloadStudentIDWidget.value == true)
   }
 
   @Test
@@ -309,6 +382,8 @@ struct AppFeatureTests {
     let didClear = BoolBox()
     let didClearCache = BoolBox()
     let didReloadWidget = BoolBox()
+    let didClearStudentID = BoolBox()
+    let didReloadStudentIDWidget = BoolBox()
     let store = TestStore(
       initialState: AppFeature.State(destination: .content, isLoadingSession: false)
     ) {
@@ -320,8 +395,14 @@ struct AppFeatureTests {
       $0.courseCacheClient.clear = {
         await didClearCache.set(true)
       }
+      $0.studentIDStoreClient.clear = {
+        await didClearStudentID.set(true)
+      }
       $0.widgetTimelineClient.reloadCoursesWidget = {
         await didReloadWidget.set(true)
+      }
+      $0.widgetTimelineClient.reloadStudentIDWidget = {
+        await didReloadStudentIDWidget.set(true)
       }
     }
 
@@ -333,6 +414,8 @@ struct AppFeatureTests {
     #expect(await didClear.value == true)
     #expect(await didClearCache.value == true)
     #expect(await didReloadWidget.value == true)
+    #expect(await didClearStudentID.value == true)
+    #expect(await didReloadStudentIDWidget.value == true)
   }
 
   @Test

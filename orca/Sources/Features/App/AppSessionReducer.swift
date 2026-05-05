@@ -23,6 +23,7 @@ extension AppFeature {
       state.isLoadingSession = false
       state.loginErrorMessage = nil
       state.sessionCookie = sessionCookie
+      AppSettings.appGroupDefaults.set(sessionCookie?.isEmpty == false, forKey: AppSettings.widgetIsLoggedInKey)
 
       if sessionCookie?.isEmpty == false {
         state.destination = .content
@@ -60,6 +61,7 @@ extension AppFeature {
       state.sessionCookie = sessionCookie
       state.hasStartedCourseLoad = false
       state.loginErrorMessage = nil
+      AppSettings.appGroupDefaults.set(true, forKey: AppSettings.widgetIsLoggedInKey)
       return syncCachedCoursesToWatch()
 
     case .sessionSaveFailed(let message):
@@ -69,11 +71,14 @@ extension AppFeature {
 
     case .logoutRequested, .apiUnauthorized:
       clearSessionState(&state)
+      AppSettings.appGroupDefaults.set(false, forKey: AppSettings.widgetIsLoggedInKey)
       return .run { send in
         try? await authClient.clearSessionCookie()
         try? await courseCacheClient.clear()
+        try? await studentIDStoreClient.clear()
         await watchCourseSyncClient.sync(CourseCache(updatedAt: Date(), courses: []))
         await widgetTimelineClient.reloadCoursesWidget()
+        await widgetTimelineClient.reloadStudentIDWidget()
         await send(.sessionCleared)
       }
 

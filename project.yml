@@ -22,6 +22,9 @@ packages:
   Perception:
     url: https://github.com/pointfreeco/swift-perception
     from: 2.0.0
+  swiftui-code39:
+    url: https://github.com/jiahan-wu/swiftui-code39.git
+    from: 1.1.0
 settings:
   base:
     MARKETING_VERSION: 0.1.0
@@ -87,6 +90,11 @@ targets:
       - path: orca/Sources/Models/UpcomingScheduledCourseResolver.swift
       - path: orca/Sources/Models/CourseSchedule/AppSettings.swift
       - path: orca/Sources/Models/CourseSchedule/ScheduledCourse.swift
+      - path: orca/Sources/Models/StudentIDRecord.swift
+      - path: orca/Sources/Models/StudentIDStore.swift
+    dependencies:
+      - package: swiftui-code39
+        product: Code39
     settings:
       base:
         PRODUCT_NAME: CoursesWidget

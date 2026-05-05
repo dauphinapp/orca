@@ -189,6 +189,40 @@ struct CalendarAndWidgetTests {
   }
 
   @Test
+  func studentIDStoreRoundTripsRecordThroughFallbackURL() throws {
+    let directory = FileManager.default.temporaryDirectory
+      .appendingPathComponent(UUID().uuidString, isDirectory: true)
+    defer { try? FileManager.default.removeItem(at: directory) }
+
+    let store = StudentIDStore(
+      appGroupIdentifier: "group.test.invalid",
+      fallbackDirectory: directory
+    )
+    let record = StudentIDRecord(updatedAt: Date(), studentID: "123456789")
+
+    try store.save(record)
+    let loadedRecord = try #require(store.load())
+    let cacheURL = try store.cacheURL()
+
+    #expect(loadedRecord == record)
+    #expect(FileManager.default.fileExists(atPath: cacheURL.path))
+  }
+
+  @Test
+  func studentIDStoreReturnsNilWhenRecordFileIsMissing() throws {
+    let directory = FileManager.default.temporaryDirectory
+      .appendingPathComponent(UUID().uuidString, isDirectory: true)
+    defer { try? FileManager.default.removeItem(at: directory) }
+
+    let store = StudentIDStore(
+      appGroupIdentifier: "group.test.invalid",
+      fallbackDirectory: directory
+    )
+
+    #expect(try store.load() == nil)
+  }
+
+  @Test
   func watchCoursePayloadRoundTripsThroughCourseCacheCoding() throws {
     let payload = WatchCoursePayload(
       cache: CourseCache(updatedAt: Date(), courses: [widgetSampleCourse]),
