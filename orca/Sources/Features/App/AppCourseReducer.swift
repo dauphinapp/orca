@@ -25,7 +25,7 @@ extension AppFeature {
         let cache = CourseCache(updatedAt: Date(), courses: courses)
         do {
           try await courseCacheClient.save(cache)
-          await widgetTimelineClient.reloadCoursesWidget()
+          await widgetTimelineClient.reloadWidgets()
         } catch {
           await send(.cacheSyncFailed(error.localizedDescription))
         }

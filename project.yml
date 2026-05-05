@@ -47,7 +47,7 @@ targets:
       - package: Dependencies
       - package: Perception
         product: PerceptionCore
-      - target: CoursesWidgetExtension
+      - target: WidgetsExtension
         embed: true
       - target: DauphinWatchApp
         embed: true
@@ -77,11 +77,11 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: cantpr09ram.dauphin.tests
         TEST_HOST: $(BUILT_PRODUCTS_DIR)/Dauphin.app/Dauphin
         BUNDLE_LOADER: $(TEST_HOST)
-  CoursesWidgetExtension:
+  WidgetsExtension:
     type: app-extension
     platform: iOS
     sources:
-      - path: CoursesWidget
+      - path: Widgets
       - path: orca/Sources/Models/CourseCache.swift
       - path: orca/Sources/Models/CourseCacheStore.swift
       - path: orca/Sources/Models/CourseSession.swift
@@ -97,11 +97,11 @@ targets:
         product: Code39
     settings:
       base:
-        PRODUCT_NAME: CoursesWidget
-        PRODUCT_MODULE_NAME: CoursesWidget
-        PRODUCT_BUNDLE_IDENTIFIER: cantpr09ram.dauphin.CoursesWidget
-        INFOPLIST_FILE: CoursesWidget/Info.plist
-        CODE_SIGN_ENTITLEMENTS: CoursesWidget/CoursesWidget.entitlements
+        PRODUCT_NAME: Widgets
+        PRODUCT_MODULE_NAME: Widgets
+        PRODUCT_BUNDLE_IDENTIFIER: cantpr09ram.dauphin.Widgets
+        INFOPLIST_FILE: Widgets/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Widgets/Widgets.entitlements
         SKIP_INSTALL: YES
   DauphinWatchApp:
     type: application

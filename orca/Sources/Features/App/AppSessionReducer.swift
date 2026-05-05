@@ -77,7 +77,7 @@ extension AppFeature {
         try? await courseCacheClient.clear()
         try? await studentIDStoreClient.clear()
         await watchCourseSyncClient.sync(CourseCache(updatedAt: Date(), courses: []))
-        await widgetTimelineClient.reloadCoursesWidget()
+        await widgetTimelineClient.reloadWidgets()
         await widgetTimelineClient.reloadStudentIDWidget()
         await send(.sessionCleared)
       }

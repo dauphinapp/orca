@@ -160,7 +160,7 @@ struct AppFeatureTests {
       $0.watchCourseSyncClient.sync = { cache in
         await syncedCache.set(cache)
       }
-      $0.widgetTimelineClient.reloadCoursesWidget = {
+      $0.widgetTimelineClient.reloadWidgets = {
         await didReloadWidget.set(true)
       }
       $0.studentIDClient.fetchStudentID = { cookie in
@@ -212,7 +212,7 @@ struct AppFeatureTests {
       $0.watchCourseSyncClient.sync = { cache in
         await syncedCache.set(cache)
       }
-      $0.widgetTimelineClient.reloadCoursesWidget = {
+      $0.widgetTimelineClient.reloadWidgets = {
         await didReloadWidget.set(true)
       }
       $0.studentIDStoreClient.save = { record in
@@ -240,7 +240,7 @@ struct AppFeatureTests {
   @Test
   func contentTaskKeepsCoursesWhenStudentIDSyncFails() async {
     let savedCache = CourseCacheBox()
-    let didReloadCoursesWidget = BoolBox()
+    let didReloadWidgets = BoolBox()
     let didReloadStudentIDWidget = BoolBox()
 
     let store = TestStore(
@@ -259,8 +259,8 @@ struct AppFeatureTests {
       $0.studentIDClient.fetchStudentID = { _ in
         throw TestError()
       }
-      $0.widgetTimelineClient.reloadCoursesWidget = {
-        await didReloadCoursesWidget.set(true)
+      $0.widgetTimelineClient.reloadWidgets = {
+        await didReloadWidgets.set(true)
       }
       $0.widgetTimelineClient.reloadStudentIDWidget = {
         await didReloadStudentIDWidget.set(true)
@@ -277,7 +277,7 @@ struct AppFeatureTests {
     }
 
     #expect(await savedCache.value?.courses == [sampleCourse])
-    #expect(await didReloadCoursesWidget.value == true)
+    #expect(await didReloadWidgets.value == true)
     #expect(await didReloadStudentIDWidget.value == false)
   }
 
@@ -332,7 +332,7 @@ struct AppFeatureTests {
       $0.studentIDStoreClient.clear = {
         await didClearStudentID.set(true)
       }
-      $0.widgetTimelineClient.reloadCoursesWidget = {
+      $0.widgetTimelineClient.reloadWidgets = {
         await didReloadWidget.set(true)
       }
       $0.widgetTimelineClient.reloadStudentIDWidget = {
@@ -398,7 +398,7 @@ struct AppFeatureTests {
       $0.studentIDStoreClient.clear = {
         await didClearStudentID.set(true)
       }
-      $0.widgetTimelineClient.reloadCoursesWidget = {
+      $0.widgetTimelineClient.reloadWidgets = {
         await didReloadWidget.set(true)
       }
       $0.widgetTimelineClient.reloadStudentIDWidget = {

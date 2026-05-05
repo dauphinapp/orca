@@ -1,8 +1,8 @@
 import SwiftUI
 import WidgetKit
 
-struct CoursesNextUpHomeWidgetView: View {
-  let entry: CoursesWidgetEntry
+struct UpcomingCoursesHomeWidgetView: View {
+  let entry: UpcomingCoursesWidgetEntry
 
   var body: some View {
     Group {
@@ -139,11 +139,11 @@ struct CoursesNextUpHomeWidgetView: View {
 }
 
 #Preview("Home / Small Scenarios", as: .systemSmall) {
-  CoursesNextUpWidget()
+  UpcomingCoursesWidget()
 } timeline: {
-  CoursesWidgetPreviewData.notLoggedIn
-  CoursesWidgetPreviewData.noUpcomingCourses
-  CoursesWidgetPreviewData.sameDayCourses
-  CoursesWidgetPreviewData.mixedDayCourses
-  CoursesWidgetPreviewData.englishNames
+  UpcomingCoursesWidgetPreviewData.notLoggedIn
+  UpcomingCoursesWidgetPreviewData.noUpcomingCourses
+  UpcomingCoursesWidgetPreviewData.sameDayCourses
+  UpcomingCoursesWidgetPreviewData.mixedDayCourses
+  UpcomingCoursesWidgetPreviewData.englishNames
 }

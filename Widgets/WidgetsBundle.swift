@@ -2,9 +2,9 @@ import SwiftUI
 import WidgetKit
 
 @main
-struct CoursesWidgetBundle: WidgetBundle {
+struct WidgetsBundle: WidgetBundle {
   var body: some Widget {
-    CoursesNextUpWidget()
+    UpcomingCoursesWidget()
     StudentIDWidget()
   }
 }

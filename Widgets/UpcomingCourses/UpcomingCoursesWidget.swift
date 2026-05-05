@@ -2,7 +2,7 @@ import Foundation
 import SwiftUI
 import WidgetKit
 
-struct CoursesWidgetEntry: TimelineEntry {
+struct UpcomingCoursesWidgetEntry: TimelineEntry {
   let date: Date
   let isLoggedIn: Bool
   let upcomingCourses: [UpcomingScheduledCourse]
@@ -11,9 +11,9 @@ struct CoursesWidgetEntry: TimelineEntry {
   let showEnglishTeacherName: Bool
 }
 
-struct CoursesWidgetProvider: TimelineProvider {
-  func placeholder(in context: Context) -> CoursesWidgetEntry {
-    CoursesWidgetEntry(
+struct UpcomingCoursesWidgetProvider: TimelineProvider {
+  func placeholder(in context: Context) -> UpcomingCoursesWidgetEntry {
+    UpcomingCoursesWidgetEntry(
       date: Date(),
       isLoggedIn: true,
       upcomingCourses: previewUpcomingCourses,
@@ -23,23 +23,23 @@ struct CoursesWidgetProvider: TimelineProvider {
     )
   }
 
-  func getSnapshot(in context: Context, completion: @escaping (CoursesWidgetEntry) -> Void) {
+  func getSnapshot(in context: Context, completion: @escaping (UpcomingCoursesWidgetEntry) -> Void) {
     completion(makeEntry(now: Date()))
   }
 
-  func getTimeline(in context: Context, completion: @escaping (Timeline<CoursesWidgetEntry>) -> Void) {
+  func getTimeline(in context: Context, completion: @escaping (Timeline<UpcomingCoursesWidgetEntry>) -> Void) {
     let now = Date()
     let refreshDate = Calendar.current.date(byAdding: .minute, value: 1, to: now) ?? now.addingTimeInterval(900)
     let entry = makeEntry(now: now)
     completion(Timeline(entries: [entry], policy: .after(refreshDate)))
   }
 
-  private func makeEntry(now: Date) -> CoursesWidgetEntry {
+  private func makeEntry(now: Date) -> UpcomingCoursesWidgetEntry {
     let cache = loadCourseCache()
     let scheduledCourses = cache?.courses.scheduledCourses() ?? []
     let resolver = UpcomingScheduledCourseResolver()
 
-    return CoursesWidgetEntry(
+    return UpcomingCoursesWidgetEntry(
       date: now,
       isLoggedIn: AppSettings.isWidgetLoggedIn(courseCache: cache),
       upcomingCourses: resolver.upcomingCourses(from: scheduledCourses, now: now),
@@ -77,12 +77,12 @@ struct CoursesWidgetProvider: TimelineProvider {
   }
 }
 
-struct CoursesNextUpWidget: Widget {
-  let kind = "CoursesWidget"
+struct UpcomingCoursesWidget: Widget {
+  let kind = "Widgets"
 
   var body: some WidgetConfiguration {
-    StaticConfiguration(kind: kind, provider: CoursesWidgetProvider()) { entry in
-      CoursesWidgetEntryView(entry: entry)
+    StaticConfiguration(kind: kind, provider: UpcomingCoursesWidgetProvider()) { entry in
+      UpcomingCoursesWidgetEntryView(entry: entry)
     }
     .configurationDisplayName("Upcoming Courses")
     .description("See your next classes and today's course count.")
@@ -90,24 +90,24 @@ struct CoursesNextUpWidget: Widget {
   }
 }
 
-private struct CoursesWidgetEntryView: View {
+private struct UpcomingCoursesWidgetEntryView: View {
   @Environment(\.widgetFamily) private var family
-  let entry: CoursesWidgetEntry
+  let entry: UpcomingCoursesWidgetEntry
 
   var body: some View {
     switch family {
     case .accessoryRectangular:
-      CoursesNextUpLockScreenView(entry: entry)
+      UpcomingCoursesLockScreenWidgetView(entry: entry)
     default:
-      CoursesNextUpHomeWidgetView(entry: entry)
+      UpcomingCoursesHomeWidgetView(entry: entry)
     }
   }
 }
 
 #Preview("Entry View / Small") {
-  CoursesWidgetEntryView(entry: CoursesWidgetPreviewData.sameDayCourses)
+  UpcomingCoursesWidgetEntryView(entry: UpcomingCoursesWidgetPreviewData.sameDayCourses)
 }
 
 #Preview("Entry View / Lock Screen") {
-  CoursesWidgetEntryView(entry: CoursesWidgetPreviewData.sameDayCourses)
+  UpcomingCoursesWidgetEntryView(entry: UpcomingCoursesWidgetPreviewData.sameDayCourses)
 }
