@@ -5,6 +5,51 @@ import Testing
 
 struct CalendarAndWidgetTests {
   @Test
+  func studentIDHTMLParserExtractsStudentIDFromScorePage() throws {
+    let html = """
+    <div>
+      <i data-lucide="user" class="me-2 text-white" style="width: 18px;"></i> 學號： 411440430</div>
+    """
+
+    let studentID = try StudentIDHTMLParser().parse(data: Data(html.utf8))
+
+    #expect(studentID == "411440430")
+  }
+
+  @Test
+  func studentIDHTMLParserIgnoresExtraWhitespace() throws {
+    let html = """
+    <div>
+      學號：
+
+        411440430
+    </div>
+    """
+
+    let studentID = try StudentIDHTMLParser().parse(data: Data(html.utf8))
+
+    #expect(studentID == "411440430")
+  }
+
+  @Test
+  func studentIDHTMLParserThrowsWhenStudentIDIsMissing() {
+    let html = "<div>姓名：王小明</div>"
+
+    #expect(throws: StudentIDClientError.studentIDNotFound) {
+      try StudentIDHTMLParser().parse(data: Data(html.utf8))
+    }
+  }
+
+  @Test
+  func studentIDHTMLParserThrowsForInvalidEncoding() {
+    let data = Data([0xFF, 0xFE, 0x00])
+
+    #expect(throws: StudentIDClientError.invalidResponse) {
+      try StudentIDHTMLParser().parse(data: data)
+    }
+  }
+
+  @Test
   func calendarEventXMLParserParsesSingleAndRangedDates() throws {
     let xml = """
     <root>
@@ -186,6 +231,40 @@ struct CalendarAndWidgetTests {
 
     let loadedCache = try store.load()
     #expect(loadedCache == nil)
+  }
+
+  @Test
+  func studentIDStoreRoundTripsRecordThroughFallbackURL() throws {
+    let directory = FileManager.default.temporaryDirectory
+      .appendingPathComponent(UUID().uuidString, isDirectory: true)
+    defer { try? FileManager.default.removeItem(at: directory) }
+
+    let store = StudentIDStore(
+      appGroupIdentifier: "group.test.invalid",
+      fallbackDirectory: directory
+    )
+    let record = StudentIDRecord(updatedAt: Date(), studentID: "123456789")
+
+    try store.save(record)
+    let loadedRecord = try #require(store.load())
+    let cacheURL = try store.cacheURL()
+
+    #expect(loadedRecord == record)
+    #expect(FileManager.default.fileExists(atPath: cacheURL.path))
+  }
+
+  @Test
+  func studentIDStoreReturnsNilWhenRecordFileIsMissing() throws {
+    let directory = FileManager.default.temporaryDirectory
+      .appendingPathComponent(UUID().uuidString, isDirectory: true)
+    defer { try? FileManager.default.removeItem(at: directory) }
+
+    let store = StudentIDStore(
+      appGroupIdentifier: "group.test.invalid",
+      fallbackDirectory: directory
+    )
+
+    #expect(try store.load() == nil)
   }
 
   @Test

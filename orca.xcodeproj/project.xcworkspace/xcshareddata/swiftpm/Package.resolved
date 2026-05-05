@@ -1,5 +1,5 @@
 {
-  "originHash" : "08ec940115ac70854bdcfe464d00afc378c395f2cb6d9ed18800fc14cdbe8370",
+  "originHash" : "b94256ca36d9151eb0858e08309971bb45d06ce480a6fea0ad9a166c05d280e6",
   "pins" : [
     {
       "identity" : "combine-schedulers",
@@ -116,6 +116,15 @@
       "state" : {
         "revision" : "9de99a78f099e59caf2b2beec65a4c45d54b2081",
         "version" : "603.0.1"
+      }
+    },
+    {
+      "identity" : "swiftui-code39",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/jiahan-wu/swiftui-code39.git",
+      "state" : {
+        "revision" : "b91feac56059944e5e857c8576bc7708b2cf5b0f",
+        "version" : "1.1.0"
       }
     },
     {

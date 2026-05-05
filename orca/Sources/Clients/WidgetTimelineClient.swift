@@ -3,18 +3,23 @@ import Foundation
 import WidgetKit
 
 struct WidgetTimelineClient {
-  var reloadCoursesWidget: @Sendable () async -> Void
+  var reloadWidgets: @Sendable () async -> Void
+  var reloadStudentIDWidget: @Sendable () async -> Void
 }
 
 extension WidgetTimelineClient: DependencyKey {
   static let liveValue = Self(
-    reloadCoursesWidget: {
-      WidgetCenter.shared.reloadTimelines(ofKind: "CoursesWidget")
+    reloadWidgets: {
+      WidgetCenter.shared.reloadTimelines(ofKind: "Widgets")
+    },
+    reloadStudentIDWidget: {
+      WidgetCenter.shared.reloadTimelines(ofKind: "StudentIDWidget")
     }
   )
 
   static let testValue = Self(
-    reloadCoursesWidget: {}
+    reloadWidgets: {},
+    reloadStudentIDWidget: {}
   )
 }
 

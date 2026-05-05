@@ -1,9 +1,9 @@
 import SwiftUI
 import WidgetKit
 
-struct CoursesNextUpLockScreenView: View {
+struct UpcomingCoursesLockScreenWidgetView: View {
   @Environment(\.colorScheme) private var colorScheme
-  let entry: CoursesWidgetEntry
+  let entry: UpcomingCoursesWidgetEntry
 
   private func courseNameFontSize(for course: ScheduledCourse) -> CGFloat {
     course.isShowingEnglishName(showEnglish: entry.showEnglishCourseName) ? 13 : 15
@@ -107,9 +107,9 @@ struct CoursesNextUpLockScreenView: View {
 }
 
 #Preview("Lock Screen / Scenarios", as: .accessoryRectangular) {
-  CoursesNextUpWidget()
+  UpcomingCoursesWidget()
 } timeline: {
-  CoursesWidgetPreviewData.notLoggedIn
-  CoursesWidgetPreviewData.noUpcomingCourses
-  CoursesWidgetPreviewData.sameDayCourses
+  UpcomingCoursesWidgetPreviewData.notLoggedIn
+  UpcomingCoursesWidgetPreviewData.noUpcomingCourses
+  UpcomingCoursesWidgetPreviewData.sameDayCourses
 }

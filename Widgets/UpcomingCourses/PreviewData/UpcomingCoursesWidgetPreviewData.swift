@@ -35,7 +35,7 @@ let previewUpcomingCourses: [UpcomingScheduledCourse] = {
   return UpcomingScheduledCourseResolver().upcomingCourses(from: scheduledCourses, now: Date())
 }()
 
-enum CoursesWidgetPreviewData {
+enum UpcomingCoursesWidgetPreviewData {
   private static let calendar = Calendar.current
   private static let referenceDate = calendar.date(
     from: DateComponents(year: 2026, month: 4, day: 27, hour: 9, minute: 0)
@@ -202,8 +202,8 @@ enum CoursesWidgetPreviewData {
     todayCount: Int = 2,
     showEnglishCourseName: Bool = false,
     showEnglishTeacherName: Bool = false
-  ) -> CoursesWidgetEntry {
-    CoursesWidgetEntry(
+  ) -> UpcomingCoursesWidgetEntry {
+    UpcomingCoursesWidgetEntry(
       date: referenceDate,
       isLoggedIn: isLoggedIn,
       upcomingCourses: upcomingCourses,
