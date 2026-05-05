@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct DauphinWatchApp: App {
+struct WatchApp: App {
   var body: some Scene {
     WindowGroup {
       WatchCourseListView()
